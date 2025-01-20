@@ -2,6 +2,7 @@ use std::os::unix::fs::{MetadataExt, PermissionsExt};
 
 use clap::Parser;
 use colored::Colorize;
+use users::{get_group_by_gid, get_user_by_uid};
 
 /// List information about the current directory.
 #[derive(Parser)]
@@ -36,10 +37,19 @@ fn print_entry(long: bool, entry: std::fs::DirEntry) -> Result<(), Box<dyn std::
         let metadata = entry.metadata()?;
         let perms = metadata.permissions().mode();
         let perms_str = permissions_to_string(perms);
+
         let uid = metadata.uid();
+        let user = get_user_by_uid(uid).unwrap();
+        let user_name = user.name().to_string_lossy();
+
         let gid = metadata.gid();
+        let group = get_group_by_gid(gid).unwrap();
+        let group_name = group.name().to_string_lossy();
         let size = metadata.size();
-        println!("{} {} {} {} {}", perms_str, uid, gid, size, file_name);
+        println!(
+            "{} {} {} {} {}",
+            perms_str, user_name, group_name, size, file_name
+        );
     } else {
         println!("{}  ", file_name);
     }
