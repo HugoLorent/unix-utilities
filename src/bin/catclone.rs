@@ -14,7 +14,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Cli::parse();
     let mut result = String::new();
 
-    if args.files.len() >= 1 {
+    if !args.files.is_empty() {
         for file_path in &args.files {
             let file = std::fs::File::open(file_path)
                 .with_context(|| format!("could not read file `{}`", file_path.display()))?;
